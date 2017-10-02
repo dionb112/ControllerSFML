@@ -33,7 +33,7 @@ void Joystick::processEvents()
 
 	float x = (sf::Joystick::getAxisPosition(0, sf::Joystick::X));
 	float y = (sf::Joystick::getAxisPosition(0, sf::Joystick::Y));
-	std::cout << x << " " << y << std::endl;
+	//std::cout << x << " " << y << std::endl;
 	//character.move(x,y);
 
 }
