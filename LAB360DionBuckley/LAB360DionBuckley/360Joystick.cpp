@@ -3,7 +3,7 @@
 Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, "360 Controller with SFML!" }, m_anyFaceButtonPressed{ false }
 {
 	m_currState.reset();
-	m_prevState.reset();
+	m_lastState.reset();
 	if (!m_texture.loadFromFile("IMAGES/controller.jpg"))
 	{
 		std::cout << "Error loading texture";
@@ -50,7 +50,7 @@ void Xbox360Controller::run()
 
 void Xbox360Controller::update()
 {
-	setPrevious();
+	setLast();
 }
 
 void Xbox360Controller::isConnected()
@@ -70,53 +70,32 @@ void Xbox360Controller::processEvents()
 	sf::Event event;
 	while (m_window.pollEvent(event))
 	{
-		if (!m_anyFaceButtonPressed)
+		if (sf::Event::JoystickButtonPressed == event.type)
 		{
-			if (sf::Joystick::isButtonPressed(0, 0))
+			switch (event.joystickButton.button)
 			{
+			case 0:
 				m_currState.A = true;
-				m_prevState.A = true;
-				m_anyFaceButtonPressed = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 1))
-			{
+				m_lastState.reset();
+				m_lastState.A = true;
+				break;
+			case 1:
 				m_currState.B = true;
-				m_prevState.B = true;
-				m_anyFaceButtonPressed = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 2))
-			{
+				m_lastState.reset();
+				m_lastState.B = true;
+				break;
+			case 2:
 				m_currState.X = true;
-				m_prevState.X = true;
-				m_anyFaceButtonPressed = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 3))
-			{
+				m_lastState.reset();
+				m_lastState.X = true;
+				break;
+			case 3:
 				m_currState.Y = true;
-				m_prevState.Y = true;
-				m_anyFaceButtonPressed = true;
+				m_lastState.reset();
+				m_lastState.Y = true;
+				break;
 			}
 		}
-		else
-		{
-			if (sf::Joystick::isButtonPressed(0, 0))
-			{
-				m_currState.A = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 1))
-			{
-				m_currState.B = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 2))
-			{
-				m_currState.X = true;
-			}
-			if (sf::Joystick::isButtonPressed(0, 3))
-			{
-				m_currState.Y = true;
-			}
-		}
-		
 
 		if (sf::Event::JoystickButtonReleased == event.type)
 		{
@@ -183,21 +162,21 @@ void Xbox360Controller::render()
 	m_window.display();
 }
 
-void Xbox360Controller::setPrevious()
+void Xbox360Controller::setLast()
 {
-	if (m_prevState.A)
+	if (m_lastState.A)
 	{
 		m_lastPressed.setString("Last Pressed: A");
 	}
-	if (m_prevState.B)
+	if (m_lastState.B)
 	{
 		m_lastPressed.setString("Last Pressed: B");
 	}
-	if (m_prevState.X)
+	if (m_lastState.X)
 	{
 		m_lastPressed.setString("Last Pressed: X");
 	}
-	if (m_prevState.Y)
+	if (m_lastState.Y)
 	{
 		m_lastPressed.setString("Last Pressed: Y");
 	}

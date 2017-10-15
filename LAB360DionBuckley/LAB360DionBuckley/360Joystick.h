@@ -42,7 +42,7 @@ private:
 	//the current state of all the buttons
 	GamePadState m_currState;
 	//the previous state to use to check  for the	instant a button is pressed
-	GamePadState m_prevState;
+	GamePadState m_lastState;
 
 	sf::Font m_font;
 	sf::Sprite m_backGround;
@@ -63,7 +63,7 @@ private:
 	void connect();
 	void processEvents();
 	void render();
-	void setPrevious();
+	void setLast();
 	void setText(sf::Text &text, int scalar);
 public:
 	Xbox360Controller();
