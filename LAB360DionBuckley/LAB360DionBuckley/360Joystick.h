@@ -53,6 +53,17 @@ private:
 	sf::Text m_bPressed;
 	sf::Text m_xPressed;
 	sf::Text m_yPressed;
+	sf::Text m_lbPressed;
+	sf::Text m_rbPressed;
+	sf::Text m_startPressed;
+	sf::Text m_rsX;
+	sf::Text m_rsY;
+	sf::Text m_lsX;
+	sf::Text m_lsY;
+	sf::Text m_lTriggerCoord;
+	sf::Text m_rTriggerCoord;
+
+
 
 	//deadzone for the 'dpad'
 	const int dpadThreshold = 50;

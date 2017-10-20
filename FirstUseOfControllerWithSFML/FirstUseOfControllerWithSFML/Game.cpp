@@ -97,9 +97,9 @@ void Game::setupFontAndText()
 	m_welcomeMessage.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
 	m_welcomeMessage.setPosition(40.0f, 40.0f);
 	m_welcomeMessage.setCharacterSize(80);
-	m_welcomeMessage.setOutlineColor(sf::Color::Red);
-	m_welcomeMessage.setFillColor(sf::Color::Black);
-	m_welcomeMessage.setOutlineThickness(3.0f);
+	//m_welcomeMessage.setOutlineColor(sf::Color::Red);
+	//m_welcomeMessage.setFillColor(sf::Color::Black);
+	//m_welcomeMessage.setOutlineThickness(3.0f);
 
 }
 

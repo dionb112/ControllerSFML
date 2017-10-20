@@ -17,11 +17,28 @@ Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, 
 	setText(m_bPressed, 1);
 	setText(m_xPressed, 2);
 	setText(m_yPressed, 3);
+
+	//using the text stup function for all the characteristics, then manually setting position
+	setText(m_startPressed, 0);
+	m_startPressed.setPosition(sf::Vector2f{ 755,500 });
+	setText(m_rbPressed, 0);
+	m_rbPressed.setPosition(sf::Vector2f{ 700,125 });
+	setText(m_lbPressed, 0);
+	m_lbPressed.setPosition(sf::Vector2f{ 15,125 });
+
+	setText(m_lsX, 0);
+	setText(m_lsY, 0);
+	setText(m_rsX, 0);
+	setText(m_rsY, 0);
+	setText(m_lTriggerCoord, 0);
+	setText(m_rTriggerCoord, 0);
+
 	
-	m_lastPressed.setString("Last Pressed: ");
+	m_lastPressed.setString("Last Face Button Pressed: ");
 	m_lastPressed.setFont(m_font);
 	m_lastPressed.setPosition(600, 200);
 	m_lastPressed.setFillColor(sf::Color::Black);
+	m_lastPressed.setCharacterSize(15);
 }
 
 Xbox360Controller::~Xbox360Controller()
@@ -70,6 +87,16 @@ void Xbox360Controller::processEvents()
 	sf::Event event;
 	while (m_window.pollEvent(event))
 	{
+
+		if (event.type == sf::Event::JoystickMoved)
+		{
+			switch (event.joystickMove.axis)
+			{
+			case 0:
+				std::cout << "axis got here";
+			}
+		}
+
 		if (sf::Event::JoystickButtonPressed == event.type)
 		{
 			switch (event.joystickButton.button)
@@ -93,6 +120,25 @@ void Xbox360Controller::processEvents()
 				m_currState.Y = true;
 				m_lastState.reset();
 				m_lastState.Y = true;
+				break;
+			case 4:
+				m_currState.LB = true;
+				break;
+			case 5:
+				m_currState.RB = true;
+				break;
+			case 6:
+				m_window.close(); //exit
+			case 7:
+				m_currState.Start = true;
+				break;
+			case 8:
+				m_currState.LeftThumbClick = true;
+				break;
+			case 9:
+				m_currState.RightThumbClick = true;
+				break;
+			default:
 				break;
 			}
 		}
@@ -158,6 +204,18 @@ void Xbox360Controller::render()
 	{
 		m_window.draw(m_yPressed);
 	}
+	if (m_currState.Start)
+	{
+		m_window.draw(m_startPressed);
+	}
+	if (m_currState.LB)
+	{
+		m_window.draw(m_lbPressed);
+	}
+	if (m_currState.RB)
+	{
+		m_window.draw(m_rbPressed);
+	}
 	m_window.draw(m_lastPressed);
 	m_window.display();
 }
@@ -166,22 +224,23 @@ void Xbox360Controller::setLast()
 {
 	if (m_lastState.A)
 	{
-		m_lastPressed.setString("Last Pressed: A");
+		m_lastPressed.setString("Last Face Button Pressed: A");
 	}
 	if (m_lastState.B)
 	{
-		m_lastPressed.setString("Last Pressed: B");
+		m_lastPressed.setString("Last Face Button Pressed: B");
 	}
 	if (m_lastState.X)
 	{
-		m_lastPressed.setString("Last Pressed: X");
+		m_lastPressed.setString("Last Face Button Pressed: X");
 	}
 	if (m_lastState.Y)
 	{
-		m_lastPressed.setString("Last Pressed: Y");
+		m_lastPressed.setString("Last Face Button Pressed: Y");
 	}
 }
 ///function to setup all the face button text objects
+//using it later for all button presses
 void Xbox360Controller::setText(sf::Text &text, int scalar)
 {
 	text.setString("Pressed");
