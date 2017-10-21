@@ -21,10 +21,10 @@ Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, 
 
 	//using the text stup function for all the characteristics, then manually setting position
 	setText(m_startPressed, 0);
-	m_startPressed.setPosition(sf::Vector2f{ 755,500 });
 	setText(m_rbPressed, 0);
-	m_rbPressed.setPosition(sf::Vector2f{ 700,125 });
 	setText(m_lbPressed, 0);
+	m_startPressed.setPosition(sf::Vector2f{ 755,500 });
+	m_rbPressed.setPosition(sf::Vector2f{ 700,125 });
 	m_lbPressed.setPosition(sf::Vector2f{ 15,125 });
 
 	setText(m_lsX, 0);
@@ -33,6 +33,32 @@ Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, 
 	setText(m_rsY, 0);
 	setText(m_lTriggerCoord, 0);
 	setText(m_rTriggerCoord, 0);
+	m_lsX.setPosition(20, 200);
+	m_lsY.setPosition(20, 225);
+	m_rsX.setPosition(525, 525);
+	m_rsY.setPosition(525, 550);
+	m_lTriggerCoord.setPosition(225, 28);
+	m_rTriggerCoord.setPosition(600, 25);
+	m_lsX.setString(std::to_string(static_cast<float>(m_currState.LeftThumbStick.x)));
+	m_lsY.setString(std::to_string(static_cast<float>(m_currState.LeftThumbStick.y)));
+	m_rsX.setString(std::to_string(static_cast<float>(m_currState.RightThumbStick.x)));
+	m_rsY.setString(std::to_string(static_cast<float>(m_currState.LeftThumbStick.y)));
+	m_lTriggerCoord.setString(std::to_string(static_cast<float>(m_currState.LTrigger)));
+	m_rTriggerCoord.setString(std::to_string(static_cast<float>(m_currState.RTrigger)));
+
+	setText(m_dPadLeftPressed, 0);
+	setText(m_dPadRightPressed, 0);
+	setText(m_dPadUpPressed, 0);
+	setText(m_dPadDownPressed, 0);
+	m_dPadLeftPressed.setPosition(250, 525);
+	m_dPadRightPressed.setPosition(365, 525);
+	m_dPadUpPressed.setPosition(360, 475);
+	m_dPadDownPressed.setPosition(300, 550);
+	m_dPadLeftPressed.setString("Left");
+	m_dPadRightPressed.setString("Right");
+	m_dPadDownPressed.setString("Down");
+	m_dPadUpPressed.setString("UP");
+
 
 	
 	m_lastPressed.setString("Last Face Button Pressed: ");
@@ -91,33 +117,84 @@ void Xbox360Controller::processEvents()
 
 		if (event.type == sf::Event::JoystickMoved) // I have these external if statements so that we won't run through all the ifs unless that general event has taken place
 		{
+			//Dpad
 			if (event.joystickMove.axis == sf::Joystick::Axis::PovX)
 			{
-				std::cout << event.joystickMove.position << "   ";
+				
 				if (event.joystickMove.position > dpadThreshold)
 				{
 					m_currState.DpadRight = true;
-					m_currState.DpadLeft = false;
 				}
 				else if (event.joystickMove.position < -dpadThreshold)
 				{
-					m_currState.DpadRight = false;
 					m_currState.DpadLeft = true;
+				}
+				else
+				{
+					m_currState.DpadRight = false;
+					m_currState.DpadLeft = false;
 				}
 			}
 			if (event.joystickMove.axis == sf::Joystick::Axis::PovY)
 			{
 				if (event.joystickMove.position > dpadThreshold)
 				{
-					std::cout << "dPadUp";
+					m_currState.DpadUp = true;
 				}
 				else if (event.joystickMove.position < -dpadThreshold)
 				{
-					std::cout << "dPadDown";
+					m_currState.DpadDown = true;
+				}
+				else
+				{
+					m_currState.DpadUp = false;
+					m_currState.DpadDown = false;
+				}
+			}
+
+			//Right Thumb Stick
+			if (event.joystickMove.axis == sf::Joystick::Axis::U)
+			{
+				m_currState.RightThumbStick.x = event.joystickMove.position;
+				m_rsX.setString(std::to_string(static_cast<float>(m_currState.RightThumbStick.x)));
+			}
+			if (event.joystickMove.axis == sf::Joystick::Axis::R)
+			{
+				m_currState.RightThumbStick.y = event.joystickMove.position;
+				m_rsY.setString(std::to_string(static_cast<float>(m_currState.RightThumbStick.y)));
+			}
+
+			//Left Thumb Stick
+			if (event.joystickMove.axis == sf::Joystick::Axis::X)
+			{
+				m_currState.LeftThumbStick.x = event.joystickMove.position;
+				m_lsX.setString(std::to_string(static_cast<float>(m_currState.LeftThumbStick.x)));
+
+			}
+			if (event.joystickMove.axis == sf::Joystick::Axis::Y)
+			{
+				m_currState.LeftThumbStick.y = event.joystickMove.position;
+				m_lsY.setString(std::to_string(static_cast<float>(m_currState.LeftThumbStick.y)));
+
+			}
+
+			//Left and Right Triggers
+			if (event.joystickMove.axis == sf::Joystick::Axis::Z)
+			{
+				if (event.joystickMove.position <= 0)
+				{
+					m_currState.LTrigger = event.joystickMove.position;
+					m_lTriggerCoord.setString(std::to_string(m_currState.LTrigger));
+				}
+				if (event.joystickMove.position >= 0)
+				{
+					m_currState.RTrigger = event.joystickMove.position;
+					m_rTriggerCoord.setString(std::to_string(m_currState.RTrigger));
 				}
 			}
 		}
 
+		//Rest of buttons (Xbox is not counted as a button)
 		if (sf::Event::JoystickButtonPressed == event.type)
 		{
 			switch (event.joystickButton.button)
@@ -159,8 +236,6 @@ void Xbox360Controller::processEvents()
 			case 9:
 				m_currState.RightThumbClick = true;
 				break;
-			default:
-				break;
 			}
 		}
 
@@ -186,9 +261,6 @@ void Xbox360Controller::processEvents()
 			case 5:
 				m_currState.RB = false;
 				break;
-			case 6:
-				m_currState.Back = false;
-				break;
 			case 7:
 				m_currState.Start = false;
 				break;
@@ -197,8 +269,6 @@ void Xbox360Controller::processEvents()
 				break;
 			case 9:
 				m_currState.RightThumbClick = false;
-				break;
-			default:
 				break;
 			}
 		}
@@ -237,6 +307,29 @@ void Xbox360Controller::render()
 	{
 		m_window.draw(m_rbPressed);
 	}
+	if (m_currState.DpadDown)
+	{
+		m_window.draw(m_dPadDownPressed);
+	}
+	if (m_currState.DpadUp)
+	{
+		m_window.draw(m_dPadUpPressed);
+	}
+	if (m_currState.DpadLeft)
+	{
+		m_window.draw(m_dPadLeftPressed);
+	}
+	if (m_currState.DpadRight)
+	{
+		m_window.draw(m_dPadRightPressed);
+	}
+	m_window.draw(m_lsX);
+	m_window.draw(m_lsY);
+	m_window.draw(m_rsX);
+	m_window.draw(m_rsY);
+	m_window.draw(m_lTriggerCoord);
+	m_window.draw(m_rTriggerCoord);
+
 	m_window.draw(m_lastPressed);
 	m_window.display();
 }
@@ -277,10 +370,4 @@ void GamePadState::reset()
 	B = false;
 	X = false;
 	Y = false;
-	LB = false;
-	RB = false;
-	Back = false;
-	Start = false;
-	LeftThumbClick = false;
-	RightThumbClick = false;
 }

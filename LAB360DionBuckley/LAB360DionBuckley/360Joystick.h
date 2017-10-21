@@ -11,19 +11,17 @@ struct GamePadState
 	bool B;
 	bool X;
 	bool Y;
-	bool LB;
-	bool RB;
-	bool LeftThumbClick;
-	bool RightThumbClick;
-	bool DpadUp;
-	bool DpadDown;
-	bool DpadLeft;
-	bool DpadRight;
-	bool Start;
-	bool Back;
-	bool Xbox;
-	float RTrigger;
-	float LTrigger;
+	bool LB = false;
+	bool RB = false;
+	bool LeftThumbClick = false;
+	bool RightThumbClick = false;
+	bool DpadUp = false;
+	bool DpadDown = false;
+	bool DpadLeft = false;
+	bool DpadRight = false;
+	bool Start = false;
+	float RTrigger = 0;
+	float LTrigger = 0;
 	sf::Vector2f RightThumbStick;
 	sf::Vector2f LeftThumbStick;
 
@@ -61,6 +59,10 @@ private:
 	sf::Text m_lsY;
 	sf::Text m_lTriggerCoord;
 	sf::Text m_rTriggerCoord;
+	sf::Text m_dPadUpPressed;
+	sf::Text m_dPadDownPressed;
+	sf::Text m_dPadLeftPressed;
+	sf::Text m_dPadRightPressed;
 
 
 
