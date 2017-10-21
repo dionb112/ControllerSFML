@@ -1,9 +1,10 @@
 #include "360Joystick.h"
 
-Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, "360 Controller with SFML!" }, m_anyFaceButtonPressed{ false }
+Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, "360 Controller with SFML!" }
 {
 	m_currState.reset();
 	m_lastState.reset();
+
 	if (!m_texture.loadFromFile("IMAGES/controller.jpg"))
 	{
 		std::cout << "Error loading texture";
@@ -88,12 +89,32 @@ void Xbox360Controller::processEvents()
 	while (m_window.pollEvent(event))
 	{
 
-		if (event.type == sf::Event::JoystickMoved)
+		if (event.type == sf::Event::JoystickMoved) // I have these external if statements so that we won't run through all the ifs unless that general event has taken place
 		{
-			switch (event.joystickMove.axis)
+			if (event.joystickMove.axis == sf::Joystick::Axis::PovX)
 			{
-			case 0:
-				std::cout << "axis got here";
+				std::cout << event.joystickMove.position << "   ";
+				if (event.joystickMove.position > dpadThreshold)
+				{
+					m_currState.DpadRight = true;
+					m_currState.DpadLeft = false;
+				}
+				else if (event.joystickMove.position < -dpadThreshold)
+				{
+					m_currState.DpadRight = false;
+					m_currState.DpadLeft = true;
+				}
+			}
+			if (event.joystickMove.axis == sf::Joystick::Axis::PovY)
+			{
+				if (event.joystickMove.position > dpadThreshold)
+				{
+					std::cout << "dPadUp";
+				}
+				else if (event.joystickMove.position < -dpadThreshold)
+				{
+					std::cout << "dPadDown";
+				}
 			}
 		}
 

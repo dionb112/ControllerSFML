@@ -36,7 +36,6 @@ struct GamePadState
 class Xbox360Controller
 {
 private:
-	bool m_anyFaceButtonPressed;
 	//index count for multiple controllers if connected 
 	int sf_Joystick_index;
 	//the current state of all the buttons
