@@ -59,7 +59,9 @@ Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, 
 	m_dPadDownPressed.setString("Down");
 	m_dPadUpPressed.setString("UP");
 
-
+	setText(m_isConnectedText, 0);
+	m_isConnectedText.setPosition(300, 125);
+	m_isConnectedText.setCharacterSize(15);
 	
 	m_lastPressed.setString("Last Face Button Pressed: ");
 	m_lastPressed.setFont(m_font);
@@ -74,7 +76,6 @@ Xbox360Controller::~Xbox360Controller()
 
 void Xbox360Controller::run()
 {
-	isConnected();
 	sf::Clock clock;
 	sf::Time timePerFrame = sf::seconds(1.0f / 60.0f);
 	sf::Time timeSinceUpdate = sf::Time::Zero;
@@ -94,6 +95,7 @@ void Xbox360Controller::run()
 
 void Xbox360Controller::update()
 {
+	isConnected();
 	setLast();
 }
 
@@ -101,7 +103,11 @@ void Xbox360Controller::isConnected()
 {
 	if (sf::Joystick::isConnected(0))
 	{
-		std::cout << "Joystick 0 is connected" << std::endl;
+		m_isConnectedText.setString("   Joystick 0 is connected");
+	}
+	else
+	{
+		m_isConnectedText.setString("No Controller is connected!");
 	}
 }
 
@@ -329,7 +335,7 @@ void Xbox360Controller::render()
 	m_window.draw(m_rsY);
 	m_window.draw(m_lTriggerCoord);
 	m_window.draw(m_rTriggerCoord);
-
+	m_window.draw(m_isConnectedText);
 	m_window.draw(m_lastPressed);
 	m_window.display();
 }
@@ -355,13 +361,13 @@ void Xbox360Controller::setLast()
 }
 ///function to setup all the face button text objects
 //using it later for all button presses
-void Xbox360Controller::setText(sf::Text &text, int scalar)
+void Xbox360Controller::setText(sf::Text &t_text, int t_scalar)
 {
-	text.setString("Pressed");
-	text.setFont(m_font);
-	int y = 420 - (scalar * 60);
-	text.setPosition(750, y);
-	text.setFillColor(sf::Color::Black);
+	t_text.setString("Pressed");
+	t_text.setFont(m_font);
+	int y = 420 - (t_scalar * 60);
+	t_text.setPosition(750, y);
+	t_text.setFillColor(sf::Color::Black);
 }
 
 void GamePadState::reset()

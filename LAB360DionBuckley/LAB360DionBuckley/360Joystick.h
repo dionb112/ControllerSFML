@@ -64,7 +64,7 @@ private:
 	sf::Text m_dPadLeftPressed;
 	sf::Text m_dPadRightPressed;
 
-
+	sf::Text m_isConnectedText;
 
 	//deadzone for the 'dpad'
 	const int dpadThreshold = 50;
@@ -76,10 +76,10 @@ private:
 	void processEvents();
 	void render();
 	void setLast();
-	void setText(sf::Text &text, int scalar);
+	void setText(sf::Text &t_text, int t_scalar);
+
 public:
 	Xbox360Controller();
 	~Xbox360Controller();
 	void run();
-
 };
