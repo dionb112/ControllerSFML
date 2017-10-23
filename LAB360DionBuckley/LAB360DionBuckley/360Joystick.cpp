@@ -1,6 +1,11 @@
 #include "360Joystick.h"
 
-Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, "360 Controller with SFML!" }
+Xbox360Controller::Xbox360Controller() : 
+	m_window{ sf::VideoMode{ 900,600,32 }, "360 Controller with SFML!" },
+	m_canRenderRsCoords{ false },
+	m_canRenderLsCoords{ false },
+	m_canRenderLTriggerCoords{ false },
+	m_canRenderRTriggerCoords{ false }
 {
 	m_currState.reset();
 	m_lastState.reset();
@@ -27,12 +32,18 @@ Xbox360Controller::Xbox360Controller() : m_window{ sf::VideoMode{ 900,600,32 }, 
 	m_rbPressed.setPosition(sf::Vector2f{ 700,125 });
 	m_lbPressed.setPosition(sf::Vector2f{ 15,125 });
 
+	setText(m_lsPressed, 0);
+	setText(m_rsPressed, 0);
 	setText(m_lsX, 0);
 	setText(m_lsY, 0);
 	setText(m_rsX, 0);
 	setText(m_rsY, 0);
 	setText(m_lTriggerCoord, 0);
 	setText(m_rTriggerCoord, 0);
+
+	m_lsPressed.setPosition(20, 315);
+	m_rsPressed.setPosition(510, 500);
+
 	m_lsX.setPosition(20, 200);
 	m_lsY.setPosition(20, 225);
 	m_rsX.setPosition(525, 525);
@@ -97,8 +108,59 @@ void Xbox360Controller::update()
 {
 	isConnected();
 	setLast();
-}
+	//Left Stick Deadzone
+	if (m_currState.LeftThumbStick.x < STICK_DEADZONE ||
+		m_currState.LeftThumbStick.x > -STICK_DEADZONE ||
+		m_currState.LeftThumbStick.y < STICK_DEADZONE ||
+		m_currState.LeftThumbStick.y > -STICK_DEADZONE)
+	{
+		m_canRenderLsCoords = false;
+	}
+	if (m_currState.LeftThumbStick.x > STICK_DEADZONE ||
+			 m_currState.LeftThumbStick.x < -STICK_DEADZONE ||
+			 m_currState.LeftThumbStick.y > STICK_DEADZONE ||
+			 m_currState.LeftThumbStick.y < -STICK_DEADZONE)
+	{
+		m_canRenderLsCoords = true;
+	}
 
+	//Right Stick Deadzone
+	if (m_currState.RightThumbStick.x < STICK_DEADZONE ||
+		m_currState.RightThumbStick.x > -STICK_DEADZONE ||
+		m_currState.RightThumbStick.y < STICK_DEADZONE ||
+		m_currState.RightThumbStick.y > -STICK_DEADZONE)
+	{
+		m_canRenderRsCoords = false;
+	}
+	if (m_currState.RightThumbStick.x > STICK_DEADZONE ||
+		m_currState.RightThumbStick.x < -STICK_DEADZONE ||
+		m_currState.RightThumbStick.y > STICK_DEADZONE ||
+		m_currState.RightThumbStick.y < -STICK_DEADZONE)
+	{
+		m_canRenderRsCoords = true;
+	}
+
+	//Trigger deadzones
+	if (m_currState.LTrigger < TRIGGER_DEADZONE )
+	{
+		m_canRenderLTriggerCoords = false;
+	}
+	else
+	{
+		m_canRenderLTriggerCoords = true;
+	}
+	if (m_currState.RTrigger < TRIGGER_DEADZONE)
+	{
+		m_canRenderRTriggerCoords = false;
+	}
+	else
+	{
+		m_canRenderRTriggerCoords = true;
+	}
+}
+/// <summary>
+/// function checking if one joystick is connected or not, can be extended for multiple joysticks easily
+/// </summary>
 void Xbox360Controller::isConnected()
 {
 	if (sf::Joystick::isConnected(0))
@@ -111,27 +173,23 @@ void Xbox360Controller::isConnected()
 	}
 }
 
-void Xbox360Controller::connect()
-{
-}
-
 void Xbox360Controller::processEvents()
 {
 	sf::Event event;
 	while (m_window.pollEvent(event))
 	{
 
-		if (event.type == sf::Event::JoystickMoved) // I have these external if statements so that we won't run through all the ifs unless that general event has taken place
+		if (event.type == sf::Event::JoystickMoved) // I have these broad external if statements so that we won't run through all the code unless that general event has taken place
 		{
 			//Dpad
 			if (event.joystickMove.axis == sf::Joystick::Axis::PovX)
 			{
 				
-				if (event.joystickMove.position > dpadThreshold)
+				if (event.joystickMove.position > D_PAD_DEADZONE)
 				{
 					m_currState.DpadRight = true;
 				}
-				else if (event.joystickMove.position < -dpadThreshold)
+				else if (event.joystickMove.position < -D_PAD_DEADZONE)
 				{
 					m_currState.DpadLeft = true;
 				}
@@ -143,11 +201,11 @@ void Xbox360Controller::processEvents()
 			}
 			if (event.joystickMove.axis == sf::Joystick::Axis::PovY)
 			{
-				if (event.joystickMove.position > dpadThreshold)
+				if (event.joystickMove.position > D_PAD_DEADZONE)
 				{
 					m_currState.DpadUp = true;
 				}
-				else if (event.joystickMove.position < -dpadThreshold)
+				else if (event.joystickMove.position < -D_PAD_DEADZONE)
 				{
 					m_currState.DpadDown = true;
 				}
@@ -187,16 +245,19 @@ void Xbox360Controller::processEvents()
 			//Left and Right Triggers
 			if (event.joystickMove.axis == sf::Joystick::Axis::Z)
 			{
-				if (event.joystickMove.position <= 0)
+				if (event.joystickMove.position < 0)
 				{
+					m_currState.RTrigger = 0; //opposite one needs to be reset at beggining (for both) or else the left triggers acts up.
+					m_currState.RTrigger = -event.joystickMove.position;
+					m_rTriggerCoord.setString(std::to_string(m_currState.RTrigger));
+				}
+				else if (event.joystickMove.position > 0)
+				{
+					m_currState.RTrigger = 0;
 					m_currState.LTrigger = event.joystickMove.position;
 					m_lTriggerCoord.setString(std::to_string(m_currState.LTrigger));
 				}
-				if (event.joystickMove.position >= 0)
-				{
-					m_currState.RTrigger = event.joystickMove.position;
-					m_rTriggerCoord.setString(std::to_string(m_currState.RTrigger));
-				}
+
 			}
 		}
 
@@ -329,17 +390,39 @@ void Xbox360Controller::render()
 	{
 		m_window.draw(m_dPadRightPressed);
 	}
-	m_window.draw(m_lsX);
-	m_window.draw(m_lsY);
-	m_window.draw(m_rsX);
-	m_window.draw(m_rsY);
-	m_window.draw(m_lTriggerCoord);
-	m_window.draw(m_rTriggerCoord);
+	if (m_currState.LeftThumbClick)
+	{
+		m_window.draw(m_lsPressed);
+	}
+	if (m_currState.RightThumbClick)
+	{
+		m_window.draw(m_rsPressed);
+	}
+	if (m_canRenderLsCoords)
+	{
+		m_window.draw(m_lsX);
+		m_window.draw(m_lsY);
+	}
+	if (m_canRenderRsCoords)
+	{
+		m_window.draw(m_rsX);
+		m_window.draw(m_rsY);
+	}
+	if (m_canRenderLTriggerCoords)
+	{
+		m_window.draw(m_lTriggerCoord);
+	}
+	if (m_canRenderRTriggerCoords)
+	{
+		m_window.draw(m_rTriggerCoord);
+	}
 	m_window.draw(m_isConnectedText);
 	m_window.draw(m_lastPressed);
 	m_window.display();
 }
-
+/// <summary>
+/// function setting text, should likely be called less often
+/// </summary>
 void Xbox360Controller::setLast()
 {
 	if (m_lastState.A)

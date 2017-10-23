@@ -34,6 +34,10 @@ struct GamePadState
 class Xbox360Controller
 {
 private:
+	bool m_canRenderRsCoords;
+	bool m_canRenderLsCoords;
+	bool m_canRenderLTriggerCoords;
+	bool m_canRenderRTriggerCoords;
 	//index count for multiple controllers if connected 
 	int sf_Joystick_index;
 	//the current state of all the buttons
@@ -46,6 +50,9 @@ private:
 	sf::Texture m_texture;
 	sf::Text m_lastPressed;
 
+	//WAY too many text objects, ToDo: Refactor so as to either only use one object, moving it around and rendering
+	//OR I could set this up so the text objects are only instantiated at moment of button press and deleted upon release.
+	//Not neccecary for now, but for larger projects this WOULD be an issue.
 	sf::Text m_aPressed;
 	sf::Text m_bPressed;
 	sf::Text m_xPressed;
@@ -63,16 +70,19 @@ private:
 	sf::Text m_dPadDownPressed;
 	sf::Text m_dPadLeftPressed;
 	sf::Text m_dPadRightPressed;
+	sf::Text m_lsPressed;
+	sf::Text m_rsPressed;
 
 	sf::Text m_isConnectedText;
 
 	//deadzone for the 'dpad'
-	const int dpadThreshold = 50;
+	const int D_PAD_DEADZONE = 50;
+	const int STICK_DEADZONE = 15;
+	const int TRIGGER_DEADZONE = 1.17;
 	sf::RenderWindow m_window;
 
 	void update();
 	void isConnected();
-	void connect();
 	void processEvents();
 	void render();
 	void setLast();
